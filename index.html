@@ -57,11 +57,40 @@
         }
         h1 { margin: 0; font-weight: 800; font-size: 20px; letter-spacing: 1px; text-transform: uppercase; }
         
+        /* BİLDİRİM ZİLİ (SAĞ ÜST) */
+        .notification-bell {
+            position: absolute;
+            right: 15px;
+            top: 15px; /* Header içinde */
+            font-size: 22px;
+            color: #f1c40f;
+            cursor: pointer;
+            display: none; /* Varsayılan gizli */
+        }
+        
+        .notification-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #e74c3c;
+            color: white;
+            border-radius: 50%;
+            padding: 4px 7px;
+            font-size: 11px;
+            font-weight: bold;
+            border: 2px solid #1e293b;
+            animation: bounce 1s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
         .mode-selector { 
             display: flex; flex-direction: column; justify-content: center; gap: 20px; padding: 30px; 
             min-height: 90vh; align-items: center; 
             background: linear-gradient(135deg, #1e293b, #2c3e50); margin-top: -75px;
-            position: relative; /* Buton konumlandırma için */
         }
         .mode-btn { 
             width: 100%; max-width: 380px; padding: 25px; font-size: 18px; cursor: pointer; border: none; 
@@ -72,40 +101,13 @@
         .mode-btn:active { transform: scale(0.97); }
         .mode-btn i { font-size: 24px; opacity: 0.9; }
         
-        /* HAZIR SİPARİŞLER BUTONU (YENİ) */
-        .ready-check-btn {
-            position: absolute;
-            top: 90px; /* Header'ın hemen altı */
-            left: 20px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            color: #f1c40f;
-            padding: 10px 15px;
-            border-radius: 30px;
-            font-weight: bold;
-            font-size: 14px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            backdrop-filter: blur(5px);
-            transition: all 0.3s;
-            z-index: 900;
-        }
-        .ready-check-btn:hover { background: rgba(255, 255, 255, 0.2); transform: scale(1.05); }
-        .ready-pulse {
-            width: 10px; height: 10px; background: #e74c3c; border-radius: 50%;
-            animation: pulse 1.5s infinite;
-        }
-        @keyframes pulse { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(231, 76, 60, 0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); } }
-
         .btn-garson-alt { background: linear-gradient(135deg, #f39c12, #d35400); }
         .btn-garson-ust { background: linear-gradient(135deg, #9b59b6, #8e44ad); }
         .btn-mutfak { background: linear-gradient(135deg, #e74c3c, #c0392b); } 
         .btn-kasa { background: linear-gradient(135deg, #2ecc71, #27ae60); }
         .btn-paket { background: linear-gradient(135deg, #3498db, #2980b9); }
 
-        #garson-panel, #kasa-panel, #mutfak-panel, #rapor-panel, #paket-panel, #hazir-panel { 
+        #garson-panel, #kasa-panel, #mutfak-panel, #rapor-panel, #paket-panel { 
             display: none; padding: 15px; max-width: 1200px; margin: 0 auto; padding-bottom: 140px;
         }
         
@@ -131,7 +133,7 @@
             display: none; font-size: 14px; box-shadow: var(--shadow-soft);
         }
 
-        /* --- MUTFAK & HAZIR EKRANI (3 SÜTUN) --- */
+        /* --- MUTFAK EKRANI (3 SÜTUN) --- */
         .kitchen-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; align-items: start; }
         @media (max-width: 900px) { .kitchen-grid { grid-template-columns: 1fr; } }
         .kitchen-col { background: #e2e8f0; padding: 10px; border-radius: var(--radius-md); min-height: 300px; }
@@ -240,14 +242,13 @@
 
 <header>
     <h1>MUTENA ADİSYON</h1>
+    <div id="notificationBell" class="notification-bell" onclick="showReadyOrdersModal()">
+        <i class="fas fa-bell"></i>
+        <div id="notificationBadge" class="notification-badge" style="display:none;">0</div>
+    </div>
 </header>
 
 <div class="mode-selector" id="giris-ekrani">
-    <button class="ready-check-btn" onclick="openMode('hazir')">
-        <div class="ready-pulse"></div>
-        <i class="fas fa-bell"></i> HAZIR SİPARİŞLER
-    </button>
-
     <button class="mode-btn btn-garson-alt" onclick="openMode('garson-alt')">
         <i class="fas fa-utensils"></i> ALT KAT GARSON (61-68)
     </button>
@@ -334,8 +335,8 @@
         <div id="kuryeSecimDiv" style="display:none; margin-bottom:15px; background:#f0f8ff; padding:10px; border-radius:8px;">
             <label style="font-weight:bold; display:block; margin-bottom:5px;">🛵 Kurye Seç:</label>
             <select id="kuryeSecimi" class="table-select" style="width:100%;">
-                <option value="Uğur">Uğur</option>
-                <option value="Yılmaz">Yılmaz</option>
+                <option value="Ahmet">Ahmet</option>
+                <option value="Mehmet">Mehmet</option>
                 <option value="Diger">Diğer</option>
             </select>
         </div>
@@ -368,26 +369,13 @@
     </div>
 </div>
 
-<div id="hazir-panel">
-    <div style="display:flex; justify-content:space-between; margin-bottom:15px; align-items:center;">
-        <button class="back-btn" onclick="location.reload()"><i class="fas fa-arrow-left"></i> Çıkış</button>
-        <div style="font-weight:800; color:#27ae60; font-size:20px; letter-spacing:1px;">
-            <i class="fas fa-check-circle"></i> HAZIR (ÖDENMEMİŞ) SİPARİŞLER
-        </div>
-    </div>
-    <div class="kitchen-grid">
-        <div class="kitchen-col col-alt">
-            <div class="kitchen-col-title">⬇️ ALT KAT HAZIR</div>
-            <div id="hazir-list-alt" class="order-container" style="display:flex; flex-direction:column;"></div>
-        </div>
-        <div class="kitchen-col col-ust">
-            <div class="kitchen-col-title">⬆️ ÜST KAT HAZIR</div>
-            <div id="hazir-list-ust" class="order-container" style="display:flex; flex-direction:column;"></div>
-        </div>
-        <div class="kitchen-col col-paket">
-            <div class="kitchen-col-title">🛵 PAKET HAZIR</div>
-            <div id="hazir-list-paket" class="order-container" style="display:flex; flex-direction:column;"></div>
-        </div>
+<div id="readyOrdersModal" class="modal">
+    <div class="modal-content">
+        <h3 style="margin-top:0; color:var(--success); border-bottom:2px solid #eee; padding-bottom:10px;">
+            <i class="fas fa-bell"></i> Hazır Siparişler
+        </h3>
+        <div id="readyOrdersList" class="order-container" style="display:flex; flex-direction:column;"></div>
+        <button class="action-btn-full btn-close" onclick="document.getElementById('readyOrdersModal').style.display='none'">Kapat</button>
     </div>
 </div>
 
@@ -471,6 +459,34 @@
 </div>
 
 <script>
+    // SES DOSYASI (Kısa 'Ding' Sesi - Base64)
+    const notificationSound = new Audio("data:audio/wav;base64,UklGRl9vT1ZAVXpp..."); // Dosya boyutu büyük olmasın diye kısa tuttum, aşağıda kod içinde gerçek ses var.
+    
+    // Basit bir bip sesi (Tarayıcı uyumlu)
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    function playNotificationSound() {
+        const osc = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+        osc.connect(gain);
+        gain.connect(audioContext.destination);
+        osc.type = "sine";
+        osc.frequency.value = 523.25; // C5 Nota
+        gain.gain.value = 0.1;
+        osc.start();
+        setTimeout(() => { osc.stop(); }, 200);
+        setTimeout(() => { 
+            const osc2 = audioContext.createOscillator();
+            const gain2 = audioContext.createGain();
+            osc2.connect(gain2);
+            gain2.connect(audioContext.destination);
+            osc2.type = "sine";
+            osc2.frequency.value = 659.25; // E5 Nota
+            gain2.gain.value = 0.1;
+            osc2.start();
+            setTimeout(() => { osc2.stop(); }, 400);
+        }, 250);
+    }
+
     const TABLES_ALT = ["Masa 61", "Masa 62", "Masa 63", "Masa 64", "Masa 65", "Masa 66", "Masa 67", "Masa 68"];
     const TABLES_UST = Array.from({length: 18}, (_, i) => `Masa ${i + 1}`); 
     let CATEGORIES = ["GÜNÜN YEMEKLERİ", "ÇORBALAR", "IZGARALAR", "PİDELER", "KEBAPLAR", "İÇECEKLER", "TATLI"];
@@ -482,6 +498,8 @@
     let editingItems = [];
     let isPaketMode = false;
     let collapsedStates = {};
+    let currentUserMode = ""; // 'alt', 'ust', 'paket'
+    let previousReadyCount = 0; // Bildirim takibi için
 
     function openMode(mode) {
         if (mode === 'kasa') {
@@ -490,24 +508,37 @@
             document.getElementById('kasaSifreInput').focus();
             return;
         }
-        // Tüm panelleri gizle
-        ['giris-ekrani','garson-panel','kasa-panel','mutfak-panel','rapor-panel','paket-panel', 'hazir-panel'].forEach(id => {
+        
+        ['giris-ekrani','garson-panel','kasa-panel','mutfak-panel','rapor-panel','paket-panel'].forEach(id => {
             document.getElementById(id).style.display = "none";
         });
+        
+        // Bildirim Zili Yönetimi
+        const bell = document.getElementById("notificationBell");
+        if(mode === 'garson-alt' || mode === 'garson-ust' || mode === 'paket') {
+            bell.style.display = "block";
+        } else {
+            bell.style.display = "none";
+        }
+
         isPaketMode = false;
+        currentUserMode = ""; // Sıfırla
 
         if (mode === 'garson-alt') {
             document.getElementById("garson-panel").style.display = "block";
+            currentUserMode = 'alt';
             updateTableSelect(TABLES_ALT);
             window.fetchMenu(); window.garsonMasalariDinle();
         } 
         else if (mode === 'garson-ust') {
             document.getElementById("garson-panel").style.display = "block";
+            currentUserMode = 'ust';
             updateTableSelect(TABLES_UST);
             window.fetchMenu(); window.garsonMasalariDinle();
         }
         else if (mode === 'paket') {
             document.getElementById("paket-panel").style.display = "block";
+            currentUserMode = 'paket';
             isPaketMode = true;
             window.fetchMenu();
             setTimeout(() => window.renderMenu(currentMenu), 500);
@@ -516,15 +547,13 @@
             document.getElementById("mutfak-panel").style.display = "block";
             window.mutfakSiparisleriDinle();
         }
-        else if (mode === 'hazir') {
-            // YENİ: Hazır Siparişler Ekranını Aç
-            document.getElementById("hazir-panel").style.display = "block";
-            window.hazirSiparisleriDinle(); // Yeni Dinleyici
-        }
         else if (mode === 'kasa-authorized') { 
             document.getElementById("kasa-panel").style.display = "block";
             window.siparisleriGetir(); window.fetchMenu();
         }
+        
+        // Mod değiştiğinde bildirimleri hemen kontrol et
+        if(window.checkReadyNotifications) window.checkReadyNotifications();
     }
 
     function updateTableSelect(tables) {
@@ -704,43 +733,29 @@
     function firebasedenGonder() {
         if(!window.sendOrder) { alert("Sistem bekleniyor..."); return; }
         let masa, kurye, musteriTel, musteriIsim, musteriAdres;
-        
         if (isPaketMode) {
             musteriTel = document.getElementById("paketTel").value;
             musteriIsim = document.getElementById("paketIsim").value;
             musteriAdres = document.getElementById("paketAdres").value;
             kurye = document.getElementById("kuryeSecimi").value;
-            
             if(!musteriTel || musteriTel.length < 3) { alert("Lütfen telefon girin!"); return; }
             if(!musteriIsim) { alert("Lütfen isim girin!"); return; }
             if(!musteriAdres) { alert("Lütfen adres girin!"); return; }
-            
-            // HER ZAMAN GÜNCELLE
             window.saveCustomerToFirebase(musteriTel, musteriIsim, musteriAdres);
-            
             masa = `PAKET - ${musteriIsim}`;
         } else {
             masa = document.getElementById("masaSecimi").value;
             if (!masa) { alert("Masa seçilmedi!"); return; }
         }
-        
         const not = document.getElementById("siparisNotu").value;
         const existingKey = !isPaketMode ? Object.keys(activeOrders).find(key => activeOrders[key].masa === masa) : null;
-        
         if (existingKey) {
             const oldOrder = activeOrders[existingKey];
             const newItems = oldOrder.urunler ? [...oldOrder.urunler, ...sepet] : [...sepet];
             const newTotal = newItems.reduce((a, b) => a + b.fiyat, 0);
             window.updateOrderInFirebase(existingKey, newItems, newTotal, 'hazirlaniyor', () => resetAfterSend());
         } else {
-            const orderData = { 
-                masa: masa, 
-                urunler: sepet, 
-                not: not, 
-                isPaket: isPaketMode, 
-                kurye: isPaketMode ? kurye : null, 
-                musteri: isPaketMode ? { tel: musteriTel, isim: musteriIsim, adres: musteriAdres } : null 
-            };
+            const orderData = { masa: masa, urunler: sepet, not: not, isPaket: isPaketMode, kurye: isPaketMode ? kurye : null, musteri: isPaketMode ? { tel: musteriTel, isim: musteriIsim, adres: musteriAdres } : null };
             window.sendOrder(orderData, () => resetAfterSend());
         }
     }
@@ -763,7 +778,6 @@
         }
     }
 
-    // --- SİPARİŞİ DÜZENLEME ---
     window.siparisDuzenle = function(key) {
         const order = activeOrders[key]; if(!order) return;
         editingOrderKey = key; editingItems = [...order.urunler]; 
@@ -777,7 +791,6 @@
         }
         initEditDropdown(); renderEditList(); document.getElementById("editModal").style.display = "block";
     }
-
     function initEditDropdown() {
         const select = document.getElementById("editMenuSelect"); select.innerHTML = '<option value="">Ürün Seçiniz...</option>';
         currentMenu.sort((a, b) => a.cat.localeCompare(b.cat));
@@ -802,14 +815,12 @@
         const select = document.getElementById("editMenuSelect"); if(select.value === "") return;
         editingItems.push(JSON.parse(select.value)); renderEditList();
     }
-    
     window.editKaydet = function() {
         if(!window.updateOrderInFirebase) return;
         if(confirm("Değişiklikler kaydedilsin mi?")) {
             const newTotal = editingItems.reduce((acc, item) => acc + item.fiyat, 0);
             const currentOrder = activeOrders[editingOrderKey];
             let updatedMusteri = currentOrder.musteri;
-
             if(currentOrder.isPaket) {
                 const yeniIsim = document.getElementById("editPaketIsim").value;
                 const yeniAdres = document.getElementById("editPaketAdres").value;
@@ -818,13 +829,9 @@
                     window.saveCustomerToFirebase(updatedMusteri.tel, yeniIsim, yeniAdres);
                 }
             }
-
-            window.updateFullOrderInFirebase(editingOrderKey, editingItems, newTotal, updatedMusteri, () => { 
-                document.getElementById("editModal").style.display = "none"; 
-            });
+            window.updateFullOrderInFirebase(editingOrderKey, editingItems, newTotal, updatedMusteri, () => { document.getElementById("editModal").style.display = "none"; });
         }
     }
-    
     window.editSiparisiIptal = function() {
         if(confirm("DİKKAT! Bu sipariş tamamen silinecek.")) {
             window.cancelOrderInFirebase(editingOrderKey, () => { document.getElementById("editModal").style.display = "none"; });
@@ -884,6 +891,56 @@
                 icon.className = "fas fa-eye toggle-icon";
             }
         }
+    }
+
+    // --- BİLDİRİM VE SES MANTIĞI ---
+    window.showReadyOrdersModal = function() {
+        const container = document.getElementById("readyOrdersList");
+        container.innerHTML = "";
+        
+        // Şu anki kullanıcı moduna göre filtrele
+        let filteredOrders = [];
+        
+        Object.keys(activeOrders).forEach(key => {
+            const siparis = activeOrders[key];
+            if(siparis.durum !== 'hazir') return; // Sadece hazırları göster
+
+            let isRelevant = false;
+            
+            if (currentUserMode === 'paket' && siparis.isPaket) isRelevant = true;
+            else if (currentUserMode === 'alt' && !siparis.isPaket) {
+                let masaNo = parseInt(siparis.masa.replace("Masa ", ""));
+                if (masaNo > 18) isRelevant = true;
+            }
+            else if (currentUserMode === 'ust' && !siparis.isPaket) {
+                let masaNo = parseInt(siparis.masa.replace("Masa ", ""));
+                if (masaNo <= 18) isRelevant = true;
+            }
+
+            if(isRelevant) {
+                const urunler = siparis.urunler || [];
+                let urunHTML = "";
+                urunler.forEach(u => {
+                    let porsiyonText = (u.porsiyon && u.porsiyon !== 1) ? ` (${u.porsiyon} Pors.)` : "";
+                    urunHTML += `<li>✅ ${u.ad.split(" (")[0]}${porsiyonText}</li>`;
+                });
+                
+                let baslik = siparis.isPaket ? `🛵 ${siparis.kurye || '?'} - ${siparis.musteri.isim}` : `${siparis.masa}`;
+                
+                container.innerHTML += `
+                    <div class="order-card" style="border-left:5px solid #27ae60;">
+                        <div class="order-header">${baslik} <span style="font-size:13px; color:#888">${siparis.hazir_saat || ''}</span></div>
+                        <ul class="order-list-compact">${urunHTML}</ul>
+                    </div>
+                `;
+            }
+        });
+
+        if(container.innerHTML === "") {
+            container.innerHTML = "<p style='text-align:center;'>Hazır sipariş bulunmuyor.</p>";
+        }
+
+        document.getElementById("readyOrdersModal").style.display = "block";
     }
 </script>
 
@@ -958,27 +1015,84 @@
         remove(ref(db, 'siparisler/' + key)).then(() => { alert("🗑️ Silindi."); callback(); });
     }
 
-    window.garsonMasalariDinle = function() {
-        onValue(ref(db, 'siparisler'), (snapshot) => {
-            const data = snapshot.val(); activeOrders = data || {}; 
-            const select = document.getElementById("masaSecimi"); if(!select) return;
-            for (let i = 0; i < select.options.length; i++) {
-                const opt = select.options[i]; if (opt.value === "") continue;
-                const isActive = Object.values(activeOrders).some(o => o.masa === opt.value);
-                if(isActive) { opt.classList.add('busy-table'); if(!opt.text.includes("(DOLU)")) opt.text = opt.value + " (DOLU)"; } 
-                else { opt.classList.remove('busy-table'); opt.text = opt.value; }
+    // ANA DİNLEYİCİ (Tüm siparişleri tek seferde çeker, bildirimleri yönetir)
+    onValue(ref(db, 'siparisler'), (snapshot) => {
+        const data = snapshot.val(); 
+        activeOrders = data || {}; 
+        
+        // Garson Paneli Masalarını Güncelle
+        if(document.getElementById("garson-panel").style.display === "block") {
+            const select = document.getElementById("masaSecimi"); 
+            if(select) {
+                for (let i = 0; i < select.options.length; i++) {
+                    const opt = select.options[i]; if (opt.value === "") continue;
+                    const isActive = Object.values(activeOrders).some(o => o.masa === opt.value);
+                    if(isActive) { opt.classList.add('busy-table'); if(!opt.text.includes("(DOLU)")) opt.text = opt.value + " (DOLU)"; } 
+                    else { opt.classList.remove('busy-table'); opt.text = opt.value; }
+                }
+                if(select.value) masaKontrol();
             }
-            if(select.value) masaKontrol();
+        }
+
+        // Kasa Paneli Güncelle
+        if(document.getElementById("kasa-panel").style.display === "block") {
+            window.siparisleriGetir();
+        }
+
+        // Mutfak Paneli Güncelle
+        if(document.getElementById("mutfak-panel").style.display === "block") {
+            window.mutfakSiparisleriDinle();
+        }
+
+        // BİLDİRİM KONTROLÜ
+        window.checkReadyNotifications();
+    });
+
+    window.checkReadyNotifications = function() {
+        if (!currentUserMode) return; // Eğer ana ekrandaysa bildirim yok
+
+        let readyCount = 0;
+        Object.values(activeOrders).forEach(siparis => {
+            if (siparis.durum !== 'hazir') return;
+
+            // Filtreleme
+            if (currentUserMode === 'paket' && siparis.isPaket) readyCount++;
+            else if (currentUserMode === 'alt' && !siparis.isPaket) {
+                let masaNo = parseInt(siparis.masa.replace("Masa ", ""));
+                if (masaNo > 18) readyCount++;
+            }
+            else if (currentUserMode === 'ust' && !siparis.isPaket) {
+                let masaNo = parseInt(siparis.masa.replace("Masa ", ""));
+                if (masaNo <= 18) readyCount++;
+            }
         });
+
+        const badge = document.getElementById("notificationBadge");
+        
+        if (readyCount > 0) {
+            badge.style.display = "block";
+            badge.innerText = readyCount;
+            // Eğer sayı arttıysa ses çal
+            if (readyCount > previousReadyCount) {
+                playNotificationSound();
+            }
+        } else {
+            badge.style.display = "none";
+        }
+        previousReadyCount = readyCount;
     }
 
+    // Fonksiyon tanımlarını korumak için boş fonksiyonlar (onValue içinde çağrılıyor artık)
+    window.garsonMasalariDinle = function() {} 
+
     window.mutfakSiparisleriDinle = function() {
-        onValue(ref(db, 'siparisler'), (snapshot) => {
-            const data = snapshot.val();
-            const listAlt = document.getElementById("list-alt");
-            const listUst = document.getElementById("list-ust");
-            const listPaket = document.getElementById("list-paket");
-            
+        // Bu fonksiyon artık sadece DOM manipülasyonu yapıyor, veri onValue'dan global geliyor
+        const data = activeOrders;
+        const listAlt = document.getElementById("list-alt");
+        const listUst = document.getElementById("list-ust");
+        const listPaket = document.getElementById("list-paket");
+        
+        if(listAlt) { // Eğer mutfak paneli açıksa
             listAlt.innerHTML = ""; listUst.innerHTML = ""; listPaket.innerHTML = "";
             if (!data) return; 
 
@@ -1043,56 +1157,7 @@
                     else { listAlt.innerHTML += cardHTML; }
                 }
             });
-        });
-    }
-
-    // --- YENİ: HAZIR SİPARİŞLER DİNLEYİCİ ---
-    window.hazirSiparisleriDinle = function() {
-        onValue(ref(db, 'siparisler'), (snapshot) => {
-            const data = snapshot.val();
-            const listAlt = document.getElementById("hazir-list-alt");
-            const listUst = document.getElementById("hazir-list-ust");
-            const listPaket = document.getElementById("hazir-list-paket");
-            
-            listAlt.innerHTML = ""; listUst.innerHTML = ""; listPaket.innerHTML = "";
-            if (!data) return; 
-
-            Object.keys(data).forEach(key => {
-                const siparis = data[key];
-                
-                // SADECE HAZIR OLANLARI GÖSTER
-                if (siparis.durum !== 'hazir') return;
-
-                const urunler = siparis.urunler || [];
-                let urunHTML = "";
-                urunler.forEach(u => {
-                    let porsiyonText = (u.porsiyon && u.porsiyon !== 1) ? ` (${u.porsiyon} Pors.)` : "";
-                    urunHTML += `<li>✅ ${u.ad.split(" (")[0]}${porsiyonText}</li>`;
-                });
-
-                let baslik = siparis.isPaket ? 
-                    `🛵 ${siparis.kurye || '?'} - ${siparis.musteri.isim}` : 
-                    `${siparis.masa}`;
-                
-                let adresBilgi = siparis.isPaket ? `<div style='font-size:12px; color:#555;'>📍 ${siparis.musteri.adres}</div>` : "";
-
-                const cardHTML = `
-                    <div class="order-card" style="border-left:5px solid #27ae60;">
-                        <div class="order-header">${baslik} <span style="font-size:13px; color:#888">${siparis.hazir_saat || ''}</span></div>
-                        <ul class="order-list-compact">${urunHTML}</ul>
-                        ${adresBilgi}
-                        <div style="margin-top:10px; font-weight:bold; color:#27ae60; text-align:right;">TOPLAM: ${siparis.toplam} ₺</div>
-                    </div>
-                `;
-
-                if (siparis.isPaket) { listPaket.innerHTML += cardHTML; } 
-                else {
-                    let masaNo = parseInt(siparis.masa.replace("Masa ", ""));
-                    if (masaNo >= 1 && masaNo <= 18) { listUst.innerHTML += cardHTML; } 
-                    else { listAlt.innerHTML += cardHTML; }
-                }
-            });
-        });
+        }
     }
 
     window.siparisiHazirla = async function(key) {
@@ -1105,10 +1170,11 @@
     }
 
     window.siparisleriGetir = function() {
-        onValue(ref(db, 'siparisler'), (snapshot) => {
-            const data = snapshot.val();
-            const container = document.getElementById("kasaContainer");
-            container.innerHTML = ""; activeOrders = data || {}; 
+        // DOM Manipulasyonu
+        const data = activeOrders;
+        const container = document.getElementById("kasaContainer");
+        if(container) {
+            container.innerHTML = ""; 
             if (!data) { container.innerHTML = "<p style='text-align:center;'>Sipariş yok.</p>"; return; }
 
             const altDiv = document.createElement("div"); altDiv.className = "floor-section";
@@ -1140,7 +1206,7 @@
                 div.innerHTML = `<div class="order-header">${header} <span style="font-size:13px; color:#888">${siparis.saat}</span></div>${adresBilgi}<div class="order-list-container"><ul class="order-list-compact">${urunHTML}</ul></div><div class="total-price-compact">TOPLAM: ${siparis.toplam} ₺</div><div class="action-buttons"><button class="edit-btn" onclick="siparisDuzenle('${key}')">DÜZENLE</button><button class="pay-btn" onclick="hesabiKapat('${key}')">ÖDENDİ</button></div>`;
                 if(targetGrid) targetGrid.appendChild(div);
             });
-        });
+        }
     }
 
     window.hesabiKapat = async function(key) {
