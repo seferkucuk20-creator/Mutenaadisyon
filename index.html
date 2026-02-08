@@ -2,10 +2,18 @@
 <html lang="tr">
 <head>
 <script>
-  var password = prompt("Lütfen giriş şifresini yazın:");
-  if (password != "MUTENA123") { // Şifreyi buradan değiştirebilirsin
-    alert("Hatalı şifre!");
-    window.location.href = "https://google.com"; // Yanlış şifrede başka yere atar
+  // Cihazın hafızasında 'girisYapildi' bilgisi var mı kontrol et
+  if (localStorage.getItem("mutenaGiris") !== "true") {
+    var password = prompt("Lütfen giriş şifresini yazın:");
+    
+    if (password === "MUTENA123") {
+      // Şifre doğruysa hafızaya 'true' olarak kaydet
+      localStorage.setItem("mutenaGiris", "true");
+      alert("Giriş başarılı! Bu cihazda bir daha şifre sorulmayacak.");
+    } else {
+      alert("Hatalı şifre!");
+      window.location.href = "https://google.com";
+    }
   }
 </script>
     <meta charset="UTF-8">
