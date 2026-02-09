@@ -55,6 +55,31 @@
             padding-bottom: 40px;
         }
 
+        /* --- YAZDIRMA ALANI (GİZLİ) --- */
+        #print-area { display: none; }
+
+        /* --- YAZDIRMA MODU (TERMALI YAZICI İÇİN) --- */
+        @media print {
+            body * { visibility: hidden; }
+            #print-area, #print-area * { visibility: visible; }
+            #print-area {
+                position: absolute; left: 0; top: 0; width: 100%;
+                font-family: 'Courier New', Courier, monospace; /* Fiş görünümü için */
+                color: black;
+                padding: 0; margin: 0;
+            }
+            .print-header { text-align: center; border-bottom: 2px dashed #000; padding-bottom: 10px; margin-bottom: 10px; }
+            .print-title { font-size: 18px; font-weight: bold; margin: 0; }
+            .print-info { font-size: 12px; margin-top: 5px; }
+            .print-table { width: 100%; font-size: 12px; border-collapse: collapse; margin-bottom: 10px; }
+            .print-table td { padding: 5px 0; border-bottom: 1px dashed #ccc; }
+            .print-total { text-align: right; font-size: 16px; font-weight: bold; border-top: 2px dashed #000; padding-top: 10px; }
+            .print-footer { text-align: center; font-size: 10px; margin-top: 20px; }
+            
+            /* Sayfa kenar boşluklarını sıfırla */
+            @page { margin: 0; }
+        }
+
         /* --- HEADER --- */
         header { 
             background: var(--glass);
@@ -246,7 +271,8 @@
         
         .action-buttons { display: flex; gap: 8px; margin-top: 15px; }
         .action-btn-sm { flex: 1; padding: 10px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; color: white; font-size: 13px; font-family: inherit;}
-        
+        .btn-print { background: #64748b; color: white; } /* Yazdırma butonu rengi */
+
         /* --- MUTFAK --- */
         .kitchen-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
         .kitchen-col-title { font-weight: 800; text-align: center; background: white; padding: 15px; border-radius: var(--radius-md); box-shadow: var(--shadow-sm); margin-bottom: 15px; border-bottom: 3px solid transparent;}
@@ -296,6 +322,8 @@
         <div id="notificationBadge" class="notification-badge" style="display:none;">0</div>
     </div>
 </header>
+
+<div id="print-area"></div>
 
 <div class="mode-selector" id="giris-ekrani">
     <div class="dashboard-card dash-garson-alt" onclick="openMode('garson-alt')">
@@ -1080,6 +1108,45 @@
         }
     }
 
+    // --- YAZDIRMA FONKSİYONU ---
+    window.fisiYazdir = function(key) {
+        const siparis = activeOrders[key];
+        if (!siparis) return;
+
+        const printArea = document.getElementById("print-area");
+        
+        let header = "MUTENA ADİSYON";
+        let subHeader = siparis.isPaket ? `Paket: ${siparis.musteri.isim}` : `Masa: ${siparis.masa}`;
+        let tarih = `${siparis.tarih} ${siparis.saat}`;
+        
+        let itemsHTML = "";
+        siparis.urunler.forEach(u => {
+            let porsiyon = (u.porsiyon && u.porsiyon !== 1) ? `(${u.porsiyon})` : "";
+            itemsHTML += `<tr>
+                <td>${u.ad} ${porsiyon}</td>
+                <td style="text-align:right;">${u.fiyat} ₺</td>
+            </tr>`;
+        });
+
+        let notHTML = siparis.not ? `<div style="margin-top:10px; border-top:1px dashed #000; padding-top:5px;"><strong>Not:</strong> ${siparis.not}</div>` : "";
+
+        printArea.innerHTML = `
+            <div class="print-header">
+                <h2 class="print-title">${header}</h2>
+                <div class="print-info">${tarih}</div>
+                <div class="print-info" style="font-size:14px; font-weight:bold;">${subHeader}</div>
+            </div>
+            <table class="print-table">
+                ${itemsHTML}
+            </table>
+            <div class="print-total">TOPLAM: ${siparis.toplam} ₺</div>
+            ${notHTML}
+            <div class="print-footer">Afiyet Olsun!</div>
+        `;
+
+        window.print();
+    }
+
     // --- BİLDİRİM MANTIĞI ---
     window.showReadyOrdersModal = function() {
         const container = document.getElementById("readyOrdersList");
@@ -1318,7 +1385,11 @@
                 if(isOrderDone) {
                     butonHTML = `<div class="order-details-wrapper" style="margin-top:12px; background:#dcfce7; color:#166534; text-align:center; padding:10px; border-radius:8px; font-weight:bold;">✅ HAZIR<br><span style="font-size:11px;">${siparis.hazir_saat}</span></div>`;
                 } else {
-                    butonHTML = `<button class="ready-btn" onclick="siparisiHazirla('${key}')">HAZIRLA</button>`;
+                    // YAZDIR BUTONU EKLENDİ
+                    butonHTML = `<div style="display:flex; gap:10px; margin-top:15px;">
+                        <button class="action-btn-sm btn-print" onclick="fisiYazdir('${key}')"><i class="fas fa-print"></i> YAZDIR</button>
+                        <button class="ready-btn" onclick="siparisiHazirla('${key}')" style="margin-top:0;">HAZIRLA</button>
+                    </div>`;
                 }
 
                 const cardHTML = `
@@ -1399,8 +1470,14 @@
                 let header = siparis.isPaket ? `<span>🛵 ${siparis.kurye} - ${siparis.musteri.isim}</span>` : `<span>${siparis.masa}</span>`;
                 let adresBilgi = siparis.isPaket ? `<div style='font-size:12px; color:var(--text-muted); margin-bottom:8px; border-top:1px dashed #e2e8f0; padding-top:5px;'>${siparis.musteri.adres}</div>` : "";
                 
+                // YAZDIR BUTONU KASAYA DA EKLENDİ
                 const div = document.createElement("div"); div.className = `order-card ${cardClass}`;
-                div.innerHTML = `<div class="order-header">${header} <span style="font-size:13px; color:var(--text-muted); font-weight:500;">${siparis.saat}</span></div>${adresBilgi}<div class="order-list-container"><ul class="order-list-compact">${urunHTML}</ul></div><div class="total-price-compact" style="margin-top:auto; padding-top:10px; border-top:2px solid #f1f5f9;">TOPLAM: ${siparis.toplam} ₺</div><div class="action-buttons"><button class="action-btn-sm btn-edit" onclick="siparisDuzenle('${key}')"><i class="fas fa-edit"></i> DÜZENLE</button><button class="action-btn-sm btn-pay" onclick="hesabiKapat('${key}')"><i class="fas fa-wallet"></i> ÖDENDİ</button></div>`;
+                div.innerHTML = `<div class="order-header">${header} <span style="font-size:13px; color:var(--text-muted); font-weight:500;">${siparis.saat}</span></div>${adresBilgi}<div class="order-list-container"><ul class="order-list-compact">${urunHTML}</ul></div><div class="total-price-compact" style="margin-top:auto; padding-top:10px; border-top:2px solid #f1f5f9;">TOPLAM: ${siparis.toplam} ₺</div>
+                <div class="action-buttons">
+                    <button class="action-btn-sm btn-print" onclick="fisiYazdir('${key}')"><i class="fas fa-print"></i> YAZDIR</button>
+                    <button class="action-btn-sm btn-edit" onclick="siparisDuzenle('${key}')"><i class="fas fa-edit"></i> DÜZENLE</button>
+                    <button class="action-btn-sm btn-pay" onclick="hesabiKapat('${key}')"><i class="fas fa-wallet"></i> ÖDENDİ</button>
+                </div>`;
                 if(targetGrid) targetGrid.appendChild(div);
             });
         }
