@@ -370,6 +370,23 @@
     </div>
 </div>
 
+<div id="customerListModal" class="modal">
+    <div class="modal-content">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:1px solid #f1f5f9; padding-bottom:10px;">
+            <h3 style="margin:0; color:var(--text-main);">Kayıtlı Müşteriler</h3>
+            <button onclick="openAddCustomerModal()" class="action-btn-sm" style="background:var(--success); width:auto; padding:8px 12px; font-size:13px;">
+                <i class="fas fa-user-plus"></i> Yeni Ekle
+            </button>
+        </div>
+
+        <input type="text" id="customerSearchInput" class="search-input" placeholder="🔍 İsim, Tel veya Adres Ara..." onkeyup="filterCustomers()" style="margin-bottom:10px;">
+        
+        <ul id="customerList" class="modal-list" style="max-height:50vh; overflow-y:auto; padding:0; list-style:none;"></ul>
+        
+        <button class="action-btn-full" style="background:#e2e8f0; color:#333; margin-top:10px;" onclick="document.getElementById('customerListModal').style.display='none'">Kapat</button>
+    </div>
+</div>
+
 <div id="menuManageModal" class="modal">
     <div class="modal-content" style="max-width:700px;">
         <h3>Menü Yönetimi</h3>
@@ -396,6 +413,9 @@
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; background:white; padding:15px; border-radius:var(--radius-md); box-shadow:var(--shadow-sm);">
         <button class="back-btn" onclick="location.reload()"><i class="fas fa-chevron-left"></i> Çıkış</button>
         <div style="display:flex; gap:10px;">
+<button onclick="openCustomerList()" style="background:#10b981; color:white; border:none; padding:10px 15px; border-radius:8px; font-weight:bold; cursor:pointer;">
+    <i class="fas fa-users"></i> Müşteriler
+</button>
              <button onclick="openPasswordChangeModal()" style="background:#f59e0b; color:white; border:none; padding:10px 15px; border-radius:8px; font-weight:bold; cursor:pointer;"><i class="fas fa-key"></i> Şifre</button>
             <button onclick="openMenuManager()" style="background:#3b82f6; color:white; border:none; padding:10px 15px; border-radius:8px; font-weight:bold; cursor:pointer;"><i class="fas fa-edit"></i> Menü</button>
             <button onclick="raporlariAc()" style="background:#8b5cf6; color:white; border:none; padding:10px 15px; border-radius:8px; font-weight:bold; cursor:pointer;"><i class="fas fa-chart-pie"></i> Rapor</button>
@@ -411,6 +431,7 @@
             <div style="color:var(--text-muted); font-size:13px; font-weight:600; text-transform:uppercase;">BUGÜNKÜ CİRO</div>
             <div class="report-value" id="gunlukCiro" style="font-size:28px; font-weight:800; color:var(--success); margin-top:5px;">0 ₺</div>
         </div>
+
         <div class="report-card" style="background:white; padding:20px; border-radius:var(--radius-md); box-shadow:var(--shadow-sm); text-align:center;">
             <div style="color:var(--text-muted); font-size:13px; font-weight:600; text-transform:uppercase;">İŞLEM SAYISI</div>
             <div class="report-value" id="toplamMasa" style="font-size:28px; font-weight:800; color:var(--primary); margin-top:5px;">0</div>
@@ -789,6 +810,143 @@
         if(container.innerHTML === "") { container.innerHTML = "<p style='text-align:center; color:var(--text-muted);'>Hazır sipariş bulunmuyor.</p>"; }
         document.getElementById("readyOrdersModal").style.display = "block";
     }
+/* --- MÜŞTERİ YÖNETİMİ (DÜZELTİLMİŞ VE İYİLEŞTİRİLMİŞ) --- */
+    
+    // Veriyi global değişkene atıyoruz ki her yerden erişilebilsin
+    window.allCustomersData = {}; 
+
+    window.openCustomerList = function() {
+        if(!window.fetchAllCustomers) { alert("Veritabanı bağlantısı bekleniyor..."); return; }
+        
+        window.fetchAllCustomers((data) => {
+            window.allCustomersData = data || {}; // Veriyi global kaydet
+            renderCustomerList(window.allCustomersData);
+            document.getElementById("customerListModal").style.display = "block";
+        });
+    }
+
+    window.renderCustomerList = function(data) {
+        const list = document.getElementById("customerList");
+        list.innerHTML = "";
+        
+        if(!data || Object.keys(data).length === 0) {
+            list.innerHTML = "<li style='text-align:center; padding:15px; color:#999;'>Kayıtlı müşteri bulunamadı.</li>";
+            return;
+        }
+
+        Object.entries(data)
+            .sort(([,a], [,b]) => (a.isim || "").localeCompare(b.isim || ""))
+            .forEach(([tel, info]) => {
+                const li = document.createElement("li");
+                li.style.cssText = "border-bottom:1px solid #f1f5f9; padding:12px 0;";
+                
+                const isim = info.isim || 'İsimsiz';
+                const adres = info.adres || 'Adres Girilmemiş';
+                const son = info.sonSiparis || '-';
+
+                li.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                        <div style="flex:1;">
+                            <div style="font-weight:700; color:var(--text-main); font-size:15px;">${isim}</div>
+                            <div style="color:var(--primary); font-size:13px; margin-top:2px;">
+                                <i class="fas fa-phone"></i> ${tel}
+                            </div>
+                            <div style="font-size:12px; color:#64748b; margin-top:5px; line-height:1.4;">
+                                <i class="fas fa-map-marker-alt"></i> ${adres}
+                            </div>
+                        </div>
+                        
+                        <div style="display:flex; flex-direction:column; align-items:flex-end; gap:8px; margin-left:10px;">
+                            <div style="font-size:10px; background:#f1f5f9; padding:2px 6px; border-radius:4px; color:#666;">
+                                ${son}
+                            </div>
+                            <div style="display:flex; gap:5px;">
+                                <button onclick="openEditCustomerModal('${tel}')" style="background:#3b82f6; color:white; border:none; padding:8px 10px; border-radius:6px; cursor:pointer;">
+                                    <i class="fas fa-pen"></i>
+                                </button>
+                                <button onclick="deleteCustomerFromDb('${tel}')" style="background:#ef4444; color:white; border:none; padding:8px 10px; border-radius:6px; cursor:pointer;">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                list.appendChild(li);
+        });
+    }
+
+    window.filterCustomers = function() {
+        const query = document.getElementById("customerSearchInput").value.toLowerCase();
+        const filtered = {};
+        
+        Object.entries(window.allCustomersData).forEach(([tel, info]) => {
+            const isim = (info.isim || "").toLowerCase();
+            const telefon = tel.toLowerCase();
+            const adres = (info.adres || "").toLowerCase();
+            
+            if (isim.includes(query) || telefon.includes(query) || adres.includes(query)) {
+                filtered[tel] = info;
+            }
+        });
+        renderCustomerList(filtered);
+    }
+
+    // YENİ EKLEME PENCERESİNİ AÇ
+    window.openAddCustomerModal = function() {
+        document.getElementById("custFormTitle").innerText = "Yeni Müşteri Ekle";
+        document.getElementById("custFormTel").value = "";
+        document.getElementById("custFormTel").disabled = false; 
+        document.getElementById("custFormName").value = "";
+        document.getElementById("custFormAddr").value = "";
+        document.getElementById("customerFormModal").style.display = "block";
+    }
+
+    // DÜZENLEME PENCERESİNİ AÇ (ARTIK ÇALIŞACAK)
+    window.openEditCustomerModal = function(tel) {
+        // Global veriden müşteriyi buluyoruz
+        const info = window.allCustomersData[tel];
+        
+        if(!info) {
+            alert("Hata: Müşteri bilgisi bulunamadı.");
+            return;
+        }
+
+        document.getElementById("custFormTitle").innerText = "Müşteri Düzenle";
+        document.getElementById("custFormTel").value = tel;
+        document.getElementById("custFormTel").disabled = true; // Telefon anahtar olduğu için değiştirilemez
+        document.getElementById("custFormName").value = info.isim || "";
+        document.getElementById("custFormAddr").value = info.adres || "";
+        document.getElementById("customerFormModal").style.display = "block";
+    }
+
+    window.saveCustomerToDb = function() {
+        const tel = document.getElementById("custFormTel").value.trim();
+        const isim = document.getElementById("custFormName").value.trim();
+        const adres = document.getElementById("custFormAddr").value.trim();
+
+        if(tel.length < 3 || isim.length < 2) {
+            alert("Lütfen geçerli bir telefon ve isim giriniz.");
+            return;
+        }
+
+        let sonSiparis = new Date().toLocaleDateString();
+        // Eğer mevcut bir müşteriyse eski tarihini koru
+        if(window.allCustomersData[tel] && window.allCustomersData[tel].sonSiparis) {
+            sonSiparis = window.allCustomersData[tel].sonSiparis;
+        }
+
+        if(window.saveCustomerDataDirectly) {
+            window.saveCustomerDataDirectly(tel, isim, adres, sonSiparis);
+        }
+    }
+
+    window.deleteCustomerFromDb = function(tel) {
+        if(confirm(tel + " numaralı müşteriyi silmek istediğinize emin misiniz?")) {
+            if(window.deleteCustomerDataDirectly) {
+                window.deleteCustomerDataDirectly(tel);
+            }
+        }
+    }
 </script>
 
 <script type="module">
@@ -816,6 +974,16 @@
     });
     window.saveNewPasswordToFirebase = function(newPass) {
         set(settingsRef, newPass).then(() => { alert("✅ Şifre değiştirildi!"); document.getElementById('passwordChangeModal').style.display = 'none'; });
+    }
+// --- BU KODU SCRIPT TYPE="MODULE" İÇİNE EKLE ---
+    window.fetchAllCustomers = function(callback) {
+        get(ref(db, 'musteriler')).then((snapshot) => {
+            if (snapshot.exists()) {
+                callback(snapshot.val());
+            } else {
+                callback({});
+            }
+        });
     }
 
     window.findCustomerInFirebase = function(tel, callback) {
@@ -1013,13 +1181,25 @@
                     else { targetGrid = document.getElementById("mutfak-alt"); }
                 }
 
-                let butonHTML = "";
+let butonHTML = "";
                 if(isOrderDone) {
+                    // Sipariş hazırsa yeşil kutu göster
                     butonHTML = `<div class="order-details-wrapper kitchen-ready-msg" style="margin-top:10px; background:#27ae60; color:white; text-align:center; padding:10px; border-radius:8px; font-weight:bold;">✅ SERVİSE HAZIR<br><span style="font-size:11px;">${siparis.hazir_saat}</span></div>`;
                 } else {
-                    butonHTML = `<button class="ready-btn" onclick="siparisiHazirla('${key}')">👨‍🍳 HAZIRLA</button>`;
+                    // Sipariş hazır değilse YAZDIR ve HAZIRLA butonlarını yan yana koy
+                    butonHTML = `
+                        <div style="display:flex; gap:5px; margin-top:10px;">
+                            <button class="action-btn-sm btn-print" onclick="fisiYazdir('${key}')" style="padding:10px; font-size:14px; flex:1;">
+                                <i class="fas fa-print"></i> YAZDIR
+</button>
+                            
+                            <button class="ready-btn" onclick="siparisiHazirla('${key}')" 
+                                style="flex:1.5; margin:0; padding:12px; font-size:14px; border-radius:10px; display:flex; align-items:center; justify-content:center; gap:8px; background:var(--success); color:white; border:none; font-weight:800; box-shadow:0 4px 10px rgba(16, 185, 129, 0.3); cursor:pointer; transition:transform 0.2s;">
+                                <i class="fas fa-check"></i> HAZIRLA
+                            </button>
+                        </div>
+                    `;
                 }
-
                 const cardHTML = `
                     <div id="card-${key}" class="${cardClass}">
                         <div class="order-header" style="margin-bottom:5px;">
@@ -1131,6 +1311,43 @@
     window.raporlariSifirla = function() {
         if(confirm("Günü kapatıp ciroyu sıfırlıyor musun?")) { remove(ref(db, 'arsiv')).then(() => { alert("Sıfırlandı!"); window.raporlariAc(); }); }
     }
+// --- BU KISIM SCRIPT TYPE="MODULE" İÇİNE EN ALTA EKLENECEK ---
+    
+    window.saveCustomerDataDirectly = function(tel, isim, adres, sonSiparis) {
+        set(ref(db, 'musteriler/' + tel), { 
+            isim: isim, 
+            adres: adres, 
+            sonSiparis: sonSiparis 
+        }).then(() => {
+            alert("✅ Müşteri Başarıyla Kaydedildi!");
+            document.getElementById("customerFormModal").style.display = "none";
+            if(window.openCustomerList) window.openCustomerList(); // Listeyi yenile
+        });
+    }
+
+    window.deleteCustomerDataDirectly = function(tel) {
+        remove(ref(db, 'musteriler/' + tel)).then(() => {
+            alert("🗑️ Müşteri Silindi.");
+            if(window.openCustomerList) window.openCustomerList(); // Listeyi yenile
+        });
+    }
 </script>
+<div id="customerFormModal" class="modal" style="z-index: 2200;">
+    <div class="modal-content">
+        <h3 id="custFormTitle" style="color:var(--primary); margin-top:0;">Müşteri Ekle</h3>
+        
+        <label style="font-weight:bold; font-size:13px; color:#666;">Telefon Numarası:</label>
+        <input type="tel" id="custFormTel" class="search-input" placeholder="5XXXXXXXXX" style="margin-bottom:15px;">
+        
+        <label style="font-weight:bold; font-size:13px; color:#666;">Müşteri Adı:</label>
+        <input type="text" id="custFormName" class="search-input" placeholder="Ad Soyad" style="margin-bottom:15px;">
+        
+        <label style="font-weight:bold; font-size:13px; color:#666;">Adres:</label>
+        <textarea id="custFormAddr" class="search-input" rows="4" placeholder="Tam Adres..."></textarea>
+        
+        <button class="action-btn-full" style="background:var(--success)" onclick="saveCustomerToDb()">KAYDET</button>
+        <button class="action-btn-full" style="background:#e2e8f0; color:#333" onclick="document.getElementById('customerFormModal').style.display='none'">İptal</button>
+    </div>
+</div>
 </body>
 </html>
