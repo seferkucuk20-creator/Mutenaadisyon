@@ -51,7 +51,7 @@
             padding-bottom: 40px;
         }
 
-        /* --- YAZDIRMA ALANI (GİZLİ) --- */
+        /* --- YAZDIRMA ALANI --- */
         #print-area { display: none; }
 
         @media print {
@@ -83,19 +83,11 @@
             box-sizing: border-box; box-shadow: var(--shadow-sm);
         }
         
-        h1 { 
-            margin: 0; font-weight: 800; font-size: 20px; 
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -0.5px;
-        }
+        h1 { margin: 0; font-weight: 800; font-size: 20px; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -0.5px; }
         
-        .notification-bell {
-            position: absolute; right: 20px; font-size: 24px; color: var(--text-main); cursor: pointer; display: none; transition: transform 0.2s;
-        }
+        .notification-bell { position: absolute; right: 20px; font-size: 24px; color: var(--text-main); cursor: pointer; display: none; transition: transform 0.2s; }
         .notification-bell:active { transform: scale(0.9); }
-        .notification-badge {
-            position: absolute; top: -5px; right: -5px; background: var(--danger); color: white; border-radius: 50%; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; border: 2px solid white; animation: bounce 1s infinite;
-        }
+        .notification-badge { position: absolute; top: -5px; right: -5px; background: var(--danger); color: white; border-radius: 50%; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; border: 2px solid white; animation: bounce 1s infinite; }
         @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
 
         .mode-selector { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 20px; padding: 20px; max-width: 800px; margin: 0 auto; margin-top: 20px; }
@@ -141,6 +133,9 @@
         @keyframes modalPop { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
         .order-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px; }
+        /* MUTFAK İÇİN ÖZEL SIKI GRID YAPISI */
+        .kitchen-order-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
+
         .order-card { background: var(--surface); border-radius: var(--radius-md); padding: 20px; box-shadow: var(--shadow-sm); border: 1px solid #e2e8f0; display: flex; flex-direction: column; transition: transform 0.2s; position: relative; overflow: hidden; }
         .order-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 5px; background: #cbd5e1; }
         .card-alt::before { background: var(--accent); }
@@ -153,9 +148,21 @@
         .action-btn-sm { flex: 1; padding: 10px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; color: white; font-size: 13px; font-family: inherit;}
         .btn-print { background: #64748b; color: white; }
 
-        .kitchen-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
-        .kitchen-col-title { font-weight: 800; text-align: center; background: white; padding: 15px; border-radius: var(--radius-md); box-shadow: var(--shadow-sm); margin-bottom: 15px; border-bottom: 3px solid transparent;}
+        /* Mutfak Bölüm Başlıkları (Kasa stili) */
+        .floor-section { margin-bottom: 30px; }
+        .floor-title { font-size: 16px; font-weight: 800; padding: 12px 20px; border-radius: var(--radius-md); margin-bottom: 15px; display: inline-block; box-shadow: var(--shadow-sm); }
         
+        /* --- KART KÜÇÜLTME (GİZLEME) STİLLERİ --- */
+        .card-collapsed .order-list-compact, 
+        .card-collapsed .ready-btn, 
+        .card-collapsed .order-details-wrapper,
+        .card-collapsed .action-buttons,
+        .card-collapsed .total-price-compact,
+        .card-collapsed .kitchen-ready-msg { 
+            display: none !important; 
+        }
+        .card-collapsed { padding-bottom: 10px !important; }
+
         .btn-success { background: var(--success); color: white; }
         .btn-cancel { background: var(--danger); color: white; }
         .btn-edit { background: var(--accent); color: white; }
@@ -283,12 +290,12 @@
 
 <div id="sepetModal" class="modal">
     <div class="modal-content">
-        <h3 style="margin-top:0; color: var(--primary); border-bottom: 2px solid #f1f5f9; padding-bottom: 10px;">
+        <h3 style="margin-top:0; color: var(--primary); border-bottom: 1px solid #e2e8f0; padding-bottom: 15px;">
             <i class="fas fa-shopping-basket"></i> Sipariş Özeti
         </h3>
         <ul id="sepetListesi" class="modal-list"></ul>
-        <div id="kuryeSecimDiv" style="display:none; margin-bottom:15px; background:#f0f8ff; padding:10px; border-radius:8px;">
-            <label style="font-weight:bold; display:block; margin-bottom:5px;">🛵 Kurye Seç:</label>
+        <div id="kuryeSecimDiv" style="display:none; margin-bottom:15px; background:#f0f9ff; padding:15px; border-radius:12px; border:1px solid #bae6fd;">
+            <label style="font-weight:bold; display:block; margin-bottom:8px; color:#0369a1;">🛵 Kurye Seç:</label>
             <select id="kuryeSecimi" class="table-select" style="width:100%;">
                 <option value="Uğur">Uğur</option>
                 <option value="Yılmaz">Yılmaz</option>
@@ -308,20 +315,7 @@
             <i class="fas fa-fire-alt"></i> MUTFAK
         </div>
     </div>
-    <div class="kitchen-grid">
-        <div class="kitchen-col">
-            <div class="kitchen-col-title" style="color:#d97706; border-bottom-color:#d97706;">⬇️ ALT KAT (61-68)</div>
-            <div id="list-alt" style="display:flex; flex-direction:column; gap:10px;"></div>
-        </div>
-        <div class="kitchen-col">
-            <div class="kitchen-col-title" style="color:#7c3aed; border-bottom-color:#7c3aed;">⬆️ ÜST KAT (1-18)</div>
-            <div id="list-ust" style="display:flex; flex-direction:column; gap:10px;"></div>
-        </div>
-        <div class="kitchen-col">
-            <div class="kitchen-col-title" style="color:#2563eb; border-bottom-color:#2563eb;">🛵 PAKET SERVİS</div>
-            <div id="list-paket" style="display:flex; flex-direction:column; gap:10px;"></div>
-        </div>
-    </div>
+    <div id="mutfakContainer"></div>
 </div>
 
 <div id="readyOrdersModal" class="modal">
@@ -339,12 +333,15 @@
     <div class="modal-content">
         <h3 style="color:var(--text-main);">Siparişi Düzenle</h3>
         <h4 id="editMasaBaslik" style="color:var(--primary); margin-top:-10px; margin-bottom:20px; font-weight:600;"></h4>
+        
         <div id="editPaketBilgi" style="display:none; margin-bottom:15px; border-bottom:1px dashed #e2e8f0; padding-bottom:15px;">
              <label style="font-weight:bold; color:var(--secondary); font-size:13px; display:block; margin-bottom:5px;">Müşteri Bilgileri:</label>
              <input type="text" id="editPaketIsim" class="customer-input" style="margin-bottom:8px;">
              <textarea id="editPaketAdres" class="customer-input" rows="2"></textarea>
         </div>
-        <ul id="editList" class="modal-list" style="max-height:200px; overflow-y:auto; border:1px solid #f1f5f9; border-radius:8px; padding:10px;"></ul>
+
+        <ul id="editList" class="modal-list" style="max-height:200px; overflow-y:auto;"></ul>
+        
         <div class="edit-add-area">
             <label style="font-size: 13px; font-weight: 700; color: var(--text-muted); display:block; margin-bottom:5px;">Listeye Yeni Ürün Ekle:</label>
             <div class="edit-row">
@@ -361,6 +358,7 @@
                 </button>
             </div>
         </div>
+
         <div style="text-align:right; font-weight:800; margin:20px 0; font-size:18px; color:var(--text-main);">
             Yeni Toplam: <span id="editTotal" style="color:var(--success);">0</span> ₺
         </div>
@@ -612,7 +610,7 @@
             const newTotal = newItems.reduce((a, b) => a + b.fiyat, 0);
             window.updateOrderInFirebase(existingKey, newItems, newTotal, 'hazirlaniyor', () => resetAfterSend());
         } else {
-            const orderData = { masa: masa, urunler: sepet, not: not, isPaket: isPaketMode, kurye: isPaketMode ? kurye : null, musteri: isPaketMode ? { tel: musteriTel, isim: musteriIsim, adres: musteriAdres } : null };
+            const orderData = { masa: masa, urunler: sepet, not: not, isPaket: isPaketMode, kurye: isPaketMode ? kurye : null, musteri: isPaketMode ? { tel: musteriTel, isim: musteriIsim, adres: musteriAdres } : null, lastUpdated: Date.now() };
             window.sendOrder(orderData, () => resetAfterSend());
         }
     }
@@ -708,37 +706,18 @@
     }
 
     window.openMenuManager = function() {
-        // Kategori dropdownını doldur
-        const filterSelect = document.getElementById("filterCategory");
-        filterSelect.innerHTML = '<option value="all">🔍 TÜM KATEGORİLER</option>';
-        CATEGORIES.forEach(cat => {
-            const op = document.createElement("option");
-            op.value = cat; op.text = cat;
-            filterSelect.appendChild(op);
-        });
-
+        const filterSelect = document.getElementById("filterCategory"); filterSelect.innerHTML = '<option value="all">🔍 TÜM KATEGORİLER</option>';
+        CATEGORIES.forEach(cat => { const op = document.createElement("option"); op.value = cat; op.text = cat; filterSelect.appendChild(op); });
         renderMenuManageTable(); document.getElementById("menuManageModal").style.display = "block";
         const tbody = document.getElementById("menuManageBody"); new Sortable(tbody, { handle: '.drag-handle', animation: 150, onEnd: function (evt) { updateMenuOrderFromDOM(); } });
     }
     
-    // YENİ: Kategori Silme Fonksiyonu
     window.deleteCategory = function() {
-        const filterSelect = document.getElementById("filterCategory");
-        const selectedCat = filterSelect.value;
-
-        if (selectedCat === "all") {
-            alert("Lütfen silmek istediğiniz kategoriyi yukarıdaki listeden seçiniz.");
-            return;
-        }
-
+        const filterSelect = document.getElementById("filterCategory"); const selectedCat = filterSelect.value;
+        if (selectedCat === "all") { alert("Lütfen silmek istediğiniz kategoriyi yukarıdaki listeden seçiniz."); return; }
         if (confirm(`"${selectedCat}" kategorisini silmek istediğinize emin misiniz?`)) {
             const catIndex = CATEGORIES.indexOf(selectedCat);
-            if (catIndex > -1) {
-                CATEGORIES.splice(catIndex, 1);
-                window.saveCategoriesToFirebase();
-                alert("Kategori silindi!");
-                window.openMenuManager(); // Ekranı yenile
-            }
+            if (catIndex > -1) { CATEGORIES.splice(catIndex, 1); window.saveCategoriesToFirebase(); alert("Kategori silindi!"); window.openMenuManager(); }
         }
     }
 
@@ -773,48 +752,22 @@
     window.toggleCard = function(key) {
         collapsedStates[key] = !collapsedStates[key]; const card = document.getElementById('card-' + key); const icon = document.getElementById('icon-' + key);
         if(card && icon) { if(collapsedStates[key]) { card.classList.add('card-collapsed'); icon.className = "fas fa-eye-slash toggle-icon"; } else { card.classList.remove('card-collapsed'); icon.className = "fas fa-eye toggle-icon"; } }
+        event.stopPropagation();
     }
 
-    // --- YAZDIRMA FONKSİYONU ---
     window.fisiYazdir = function(key) {
         const siparis = activeOrders[key]; if (!siparis) return;
         const printArea = document.getElementById("print-area");
-        
-        let header = "MUTENA ADİSYON"; 
-        let subHeader = siparis.isPaket ? `Paket: ${siparis.musteri.isim}` : `Masa: ${siparis.masa}`; 
-        let tarih = `${siparis.tarih} ${siparis.saat}`;
-        
-        // YENİ: Paket Servis Adres Bilgisi
+        let header = "MUTENA ADİSYON"; let subHeader = siparis.isPaket ? `Paket: ${siparis.musteri.isim}` : `Masa: ${siparis.masa}`; let tarih = `${siparis.tarih} ${siparis.saat}`;
         let deliveryInfo = "";
-        if (siparis.isPaket && siparis.musteri) {
-            deliveryInfo = `
-                <div class="print-delivery">
-                    <div>Tel: ${siparis.musteri.tel || '-'}</div>
-                    <div>Adres: ${siparis.musteri.adres || '-'}</div>
-                </div>
-            `;
-        }
-
+        if (siparis.isPaket && siparis.musteri) { deliveryInfo = `<div class="print-delivery"><div>Tel: ${siparis.musteri.tel || '-'}</div><div>Adres: ${siparis.musteri.adres || '-'}</div></div>`; }
         let itemsHTML = "";
         siparis.urunler.forEach(u => {
             let porsiyon = (u.porsiyon && u.porsiyon !== 1) ? `(${u.porsiyon})` : "";
             itemsHTML += `<tr><td>${u.ad} ${porsiyon}</td><td style="text-align:right;">${u.fiyat} ₺</td></tr>`;
         });
-        
         let notHTML = siparis.not ? `<div style="margin-top:10px; border-top:1px dashed #000; padding-top:5px;"><strong>Not:</strong> ${siparis.not}</div>` : "";
-        
-        printArea.innerHTML = `
-            <div class="print-header">
-                <h2 class="print-title">${header}</h2>
-                <div class="print-info">${tarih}</div>
-                <div class="print-info" style="font-size:14px; font-weight:bold;">${subHeader}</div>
-            </div>
-            ${deliveryInfo}
-            <table class="print-table">${itemsHTML}</table>
-            <div class="print-total">TOPLAM: ${siparis.toplam} ₺</div>
-            ${notHTML}
-            <div class="print-footer">Afiyet Olsun!</div>
-        `;
+        printArea.innerHTML = `<div class="print-header"><h2 class="print-title">${header}</h2><div class="print-info">${tarih}</div><div class="print-info" style="font-size:14px; font-weight:bold;">${subHeader}</div></div>${deliveryInfo}<table class="print-table">${itemsHTML}</table><div class="print-total">TOPLAM: ${siparis.toplam} ₺</div>${notHTML}<div class="print-footer">Afiyet Olsun!</div>`;
         window.print();
     }
 
@@ -858,15 +811,27 @@
 
     window.currentKasaSifre = "1234";
     const settingsRef = ref(db, 'settings/kasaSifresi');
-    onValue(settingsRef, (snapshot) => { if (snapshot.exists()) { window.currentKasaSifre = snapshot.val().toString(); } else { set(settingsRef, "1234"); } });
-    window.saveNewPasswordToFirebase = function(newPass) { set(settingsRef, newPass).then(() => { alert("✅ Şifre değiştirildi!"); document.getElementById('passwordChangeModal').style.display = 'none'; }); }
+    onValue(settingsRef, (snapshot) => {
+        if (snapshot.exists()) { window.currentKasaSifre = snapshot.val().toString(); } else { set(settingsRef, "1234"); }
+    });
+    window.saveNewPasswordToFirebase = function(newPass) {
+        set(settingsRef, newPass).then(() => { alert("✅ Şifre değiştirildi!"); document.getElementById('passwordChangeModal').style.display = 'none'; });
+    }
 
-    window.findCustomerInFirebase = function(tel, callback) { get(ref(db, 'musteriler/' + tel)).then((snapshot) => { if(snapshot.exists()) { callback(snapshot.val()); } else { callback(null); } }); }
-    window.saveCustomerToFirebase = function(tel, isim, adres) { set(ref(db, 'musteriler/' + tel), { isim: isim, adres: adres, sonSiparis: new Date().toLocaleDateString() }); }
+    window.findCustomerInFirebase = function(tel, callback) {
+        get(ref(db, 'musteriler/' + tel)).then((snapshot) => {
+            if(snapshot.exists()) { callback(snapshot.val()); } else { callback(null); }
+        });
+    }
+    window.saveCustomerToFirebase = function(tel, isim, adres) {
+        set(ref(db, 'musteriler/' + tel), { isim: isim, adres: adres, sonSiparis: new Date().toLocaleDateString() });
+    }
 
     window.fetchMenu = function() {
         const menuRef = ref(db, 'menu');
-        get(menuRef).then((snapshot) => { if (snapshot.exists()) { window.renderMenu(snapshot.val()); } });
+        get(menuRef).then((snapshot) => {
+            if (snapshot.exists()) { window.renderMenu(snapshot.val()); } 
+        });
         onValue(menuRef, (snapshot) => { if (snapshot.exists()) { window.renderMenu(snapshot.val()); } });
         get(ref(db, 'categories')).then(snap => { if(snap.exists()) CATEGORIES = snap.val(); else set(ref(db, 'categories'), CATEGORIES); });
     }
@@ -875,97 +840,279 @@
 
     window.sendOrder = function(orderData, callback) {
         const siparisRef = ref(db, 'siparisler');
-        const yeniSiparis = { ...orderData, durum: 'hazirlaniyor', toplam: orderData.urunler.reduce((a, b) => a + b.fiyat, 0), tarih: new Date().toLocaleDateString('tr-TR'), saat: new Date().toLocaleTimeString('tr-TR', {hour: '2-digit', minute:'2-digit'}) };
+        const yeniSiparis = {
+            ...orderData, durum: 'hazirlaniyor',
+            toplam: orderData.urunler.reduce((a, b) => a + b.fiyat, 0),
+            tarih: new Date().toLocaleDateString('tr-TR'),
+            saat: new Date().toLocaleTimeString('tr-TR', {hour: '2-digit', minute:'2-digit'}),
+            lastUpdated: Date.now()
+        };
         push(siparisRef, yeniSiparis).then(() => { alert("✅ İletildi!"); callback(); });
     }
 
     window.updateOrderInFirebase = function(key, newItems, newTotal, status, callback) {
-        update(ref(db, 'siparisler/' + key), { urunler: newItems, toplam: newTotal, durum: status }).then(() => { alert("✅ Güncellendi!"); callback(); });
+        update(ref(db, 'siparisler/' + key), { urunler: newItems, toplam: newTotal, durum: status, lastUpdated: Date.now() }).then(() => { alert("✅ Güncellendi!"); callback(); });
     }
     
+    // GÜNCELLENEN FIREBASE FONKSİYONU (Hata korumalı ve Zaman damgalı)
     window.updateFullOrderInFirebase = function(key, newItems, newTotal, musteriData, callback) {
-        const siparisRef = ref(db, 'siparisler/' + key); const updateData = { urunler: newItems, toplam: newTotal };
-        if (musteriData) { updateData.musteri = musteriData; }
-        update(siparisRef, updateData).then(() => { alert("✅ Sipariş Başarıyla Güncellendi!"); if(callback) callback(); }).catch((error) => { console.error(error); alert("❌ HATA: Kayıt yapılamadı! " + error.message); });
+        const siparisRef = ref(db, 'siparisler/' + key);
+        
+        const updateData = { 
+            urunler: newItems, 
+            toplam: newTotal,
+            lastUpdated: Date.now()
+        };
+
+        if (musteriData) {
+            updateData.musteri = musteriData;
+        }
+
+        update(siparisRef, updateData)
+            .then(() => { 
+                alert("✅ Sipariş Başarıyla Güncellendi!"); 
+                if(callback) callback(); 
+            })
+            .catch((error) => {
+                console.error(error);
+                alert("❌ HATA: Kayıt yapılamadı! " + error.message);
+            });
     }
 
-    window.cancelOrderInFirebase = function(key, callback) { remove(ref(db, 'siparisler/' + key)).then(() => { alert("🗑️ Silindi."); callback(); }); }
+    window.cancelOrderInFirebase = function(key, callback) {
+        remove(ref(db, 'siparisler/' + key)).then(() => { alert("🗑️ Silindi."); callback(); });
+    }
 
+    // ANA DİNLEYİCİ (Tüm siparişleri tek seferde çeker, bildirimleri yönetir)
     onValue(ref(db, 'siparisler'), (snapshot) => {
-        const data = snapshot.val(); activeOrders = data || {}; 
-        if(document.getElementById("garson-panel").style.display === "block") { if(window.checkTableStatus) window.checkTableStatus(); if(document.getElementById("masaSecimi").value) masaKontrol(); }
-        if(document.getElementById("kasa-panel").style.display === "block") { window.siparisleriGetir(); }
-        if(document.getElementById("mutfak-panel").style.display === "block") { window.mutfakSiparisleriGuncelle(); }
+        const data = snapshot.val(); 
+        activeOrders = data || {}; 
+        
+        if(document.getElementById("garson-panel").style.display === "block") {
+            if(window.checkTableStatus) window.checkTableStatus();
+            if(document.getElementById("masaSecimi").value) masaKontrol();
+        }
+
+        if(document.getElementById("kasa-panel").style.display === "block") {
+            window.siparisleriGetir();
+        }
+
+        if(document.getElementById("mutfak-panel").style.display === "block") {
+            window.mutfakSiparisleriGuncelle();
+        }
+
         window.checkReadyNotifications();
     });
 
     window.checkTableStatus = function() {
-        const select = document.getElementById("masaSecimi"); if(select) { for (let i = 0; i < select.options.length; i++) { const opt = select.options[i]; if (opt.value === "") continue; const isActive = Object.values(activeOrders).some(o => o.masa === opt.value); if(isActive) { opt.classList.add('busy-table'); if(!opt.text.includes("(DOLU)")) opt.text = opt.value + " (DOLU)"; } else { opt.classList.remove('busy-table'); opt.text = opt.value; } } }
+        const select = document.getElementById("masaSecimi"); 
+        if(select) {
+            for (let i = 0; i < select.options.length; i++) {
+                const opt = select.options[i]; if (opt.value === "") continue;
+                const isActive = Object.values(activeOrders).some(o => o.masa === opt.value);
+                if(isActive) { 
+                    opt.classList.add('busy-table'); 
+                    if(!opt.text.includes("(DOLU)")) opt.text = opt.value + " (DOLU)"; 
+                } 
+                else { 
+                    opt.classList.remove('busy-table'); 
+                    opt.text = opt.value; 
+                }
+            }
+        }
     }
 
     window.checkReadyNotifications = function() {
-        if (!currentUserMode) return; let readyCount = 0;
+        if (!currentUserMode) return; 
+
+        let readyCount = 0;
         Object.values(activeOrders).forEach(siparis => {
             if (siparis.durum !== 'hazir') return;
             if (currentUserMode === 'paket' && siparis.isPaket) readyCount++;
-            else if (currentUserMode === 'alt' && !siparis.isPaket) { let masaNo = parseInt(siparis.masa.replace("Masa ", "")); if (masaNo > 18) readyCount++; }
-            else if (currentUserMode === 'ust' && !siparis.isPaket) { let masaNo = parseInt(siparis.masa.replace("Masa ", "")); if (masaNo <= 18) readyCount++; }
+            else if (currentUserMode === 'alt' && !siparis.isPaket) {
+                let masaNo = parseInt(siparis.masa.replace("Masa ", ""));
+                if (masaNo > 18) readyCount++;
+            }
+            else if (currentUserMode === 'ust' && !siparis.isPaket) {
+                let masaNo = parseInt(siparis.masa.replace("Masa ", ""));
+                if (masaNo <= 18) readyCount++;
+            }
         });
+
         const badge = document.getElementById("notificationBadge");
-        if (readyCount > 0) { badge.style.display = "flex"; badge.innerText = readyCount; if (readyCount > previousReadyCount) { playNotificationSound(); } } else { badge.style.display = "none"; } previousReadyCount = readyCount;
+        if (readyCount > 0) {
+            badge.style.display = "block";
+            badge.innerText = readyCount;
+            if (readyCount > previousReadyCount) { playNotificationSound(); }
+        } else { badge.style.display = "none"; }
+        previousReadyCount = readyCount;
     }
 
     window.mutfakSiparisleriGuncelle = function() {
-        const data = activeOrders; const listAlt = document.getElementById("list-alt"); const listUst = document.getElementById("list-ust"); const listPaket = document.getElementById("list-paket");
-        if(listAlt) { 
-            listAlt.innerHTML = ""; listUst.innerHTML = ""; listPaket.innerHTML = ""; if (!data) return; 
-            Object.keys(data).forEach(key => {
-                const siparis = data[key]; const yemekler = siparis.urunler ? siparis.urunler.filter(u => u.cat !== 'İÇECEKLER') : []; if (yemekler.length === 0) return; 
-                const isOrderDone = siparis.durum === 'hazir'; const isCollapsed = collapsedStates[key] || false;
-                let cardClass = isOrderDone ? "order-card kitchen-card order-done" : "order-card kitchen-card"; if(isCollapsed) cardClass += " card-collapsed"; let iconClass = isCollapsed ? "fas fa-eye-slash toggle-icon" : "fas fa-eye toggle-icon";
-                let urunHTML = ""; yemekler.forEach(u => { let porsiyonText = (u.porsiyon && u.porsiyon !== 1) ? ` <span style='color:var(--danger); font-weight:bold;'>(${u.porsiyon} Pors.)</span>` : ""; if(isOrderDone || u.hazir) { urunHTML += `<li class="kitchen-item-ready" style="color:#94a3b8; text-decoration:line-through; font-weight:bold;">✅ ${u.ad.split(" (")[0]}${porsiyonText}</li>`; } else { urunHTML += `<li class="kitchen-item-new" style="color:var(--text-main); font-weight:700; font-size:18px; padding:5px 0;">🔥 ${u.ad.split(" (")[0]}${porsiyonText}</li>`; } });
-                let notHTML = siparis.not ? `<div style='background:#fef3c7; color:#b45309; padding:8px; margin-top:8px; border-radius:8px; font-weight:600; font-size:14px;'>📝 ${siparis.not}</div>` : ""; let paketBilgi = ""; let baslik = "";
-                if(siparis.isPaket) { baslik = `<span style="font-size:15px; color:#2563eb;"><i class="fas fa-motorcycle"></i> ${siparis.kurye || '?'} - ${siparis.musteri.isim}</span>`; paketBilgi = `<div class="order-details-wrapper" style="font-size:13px; color:var(--text-muted); margin-top:8px; padding-top:8px; border-top:1px dashed #cbd5e1;">📍 ${siparis.musteri.adres}</div>`; } else { baslik = `<span style="font-size:20px;">${siparis.masa}</span>`; }
-                let butonHTML = ""; if(isOrderDone) { butonHTML = `<div class="order-details-wrapper" style="margin-top:12px; background:#dcfce7; color:#166534; text-align:center; padding:10px; border-radius:8px; font-weight:bold;">✅ HAZIR<br><span style="font-size:11px;">${siparis.hazir_saat}</span></div>`; } else { butonHTML = `<div style="display:flex; gap:10px; margin-top:15px;"><button class="action-btn-sm btn-print" onclick="fisiYazdir('${key}')"><i class="fas fa-print"></i> YAZDIR</button><button class="ready-btn" onclick="siparisiHazirla('${key}')" style="margin-top:0;">HAZIRLA</button></div>`; }
-                const cardHTML = `<div id="card-${key}" class="${cardClass}"><div class="order-header" style="margin-bottom:8px;">${baslik} <i id="icon-${key}" class="${iconClass}" onclick="toggleCard('${key}')"></i><span class="order-details-wrapper" style="font-size:13px; color:var(--text-muted); float:right; margin-right:10px; font-weight:500;">${siparis.saat}</span></div><ul class="order-list-compact" style="margin-bottom:10px;">${urunHTML}</ul><div class="order-details-wrapper">${notHTML}</div>${paketBilgi}${butonHTML}</div>`;
-                if (siparis.isPaket) { listPaket.innerHTML += cardHTML; } else { let masaNo = parseInt(siparis.masa.replace("Masa ", "")); if (masaNo >= 1 && masaNo <= 18) { listUst.innerHTML += cardHTML; } else { listAlt.innerHTML += cardHTML; } }
+        const data = activeOrders;
+        const container = document.getElementById("mutfakContainer");
+        
+        if(container) { 
+            container.innerHTML = "";
+            if (!data) { container.innerHTML = "<p style='text-align:center;'>Sipariş yok.</p>"; return; } 
+
+            const altDiv = document.createElement("div"); altDiv.className = "floor-section";
+            altDiv.innerHTML = '<div class="floor-title bg-alt" style="color:#d97706; background:#fffbeb; border:1px solid #fcd34d;">⬇️ ALT KAT</div><div class="kitchen-order-container" id="mutfak-alt"></div>';
+            
+            const ustDiv = document.createElement("div"); ustDiv.className = "floor-section";
+            ustDiv.innerHTML = '<div class="floor-title bg-ust" style="color:#7c3aed; background:#f5f3ff; border:1px solid #c4b5fd;">⬆️ ÜST KAT</div><div class="kitchen-order-container" id="mutfak-ust"></div>';
+
+            const paketDiv = document.createElement("div"); paketDiv.className = "floor-section";
+            paketDiv.innerHTML = '<div class="floor-title bg-paket" style="color:#2563eb; background:#eff6ff; border:1px solid #bfdbfe;">🛵 PAKET SERVİS</div><div class="kitchen-order-container" id="mutfak-paket"></div>';
+
+            container.appendChild(altDiv); container.appendChild(ustDiv); container.appendChild(paketDiv);
+
+            // SIRALAMA MANTIĞI
+            const sortedOrders = Object.entries(data).sort((a, b) => (b[1].lastUpdated || 0) - (a[1].lastUpdated || 0));
+
+            sortedOrders.forEach(([key, siparis]) => {
+                const yemekler = siparis.urunler ? siparis.urunler.filter(u => u.cat !== 'İÇECEKLER') : [];
+                if (yemekler.length === 0) return; 
+
+                const isOrderDone = siparis.durum === 'hazir';
+                
+                let isCollapsed = collapsedStates[key];
+                if (isCollapsed === undefined) { isCollapsed = isOrderDone; }
+                
+                let cardClass = isOrderDone ? "order-card kitchen-card order-done" : "order-card kitchen-card";
+                if(isCollapsed) cardClass += " card-collapsed";
+                let iconClass = isCollapsed ? "fas fa-eye-slash toggle-icon" : "fas fa-eye toggle-icon";
+
+                let urunHTML = "";
+                yemekler.forEach(u => {
+                    let displayName = u.ad.replace(/ \(\d+(\.\d+)? Pors\.\)$/, "");
+                    if(u.porsiyon && u.porsiyon != 1) {
+                        displayName += ` <span style='color:var(--danger); font-weight:bold;'>(${u.porsiyon} Pors.)</span>`;
+                    }
+
+                    if(isOrderDone || u.hazir) {
+                        urunHTML += `<li class="kitchen-item-ready" style="color:#94a3b8; text-decoration:line-through; font-weight:bold;">✅ ${displayName}</li>`;
+                    } else {
+                        urunHTML += `<li class="kitchen-item-new">🔥 ${displayName}</li>`;
+                    }
+                });
+
+                let notHTML = siparis.not ? `<div style='background:#fff3cd; padding:5px; margin-top:5px; border-radius:5px; font-weight:bold;'>📝 ${siparis.not}</div>` : "";
+                let paketBilgi = "";
+                let baslik = "";
+                let targetGrid;
+                
+                if(siparis.isPaket) {
+                    targetGrid = document.getElementById("mutfak-paket");
+                    baslik = `<span style="font-size:15px;">${siparis.kurye || '?'} - ${siparis.musteri.isim}</span>`;
+                    paketBilgi = `<div class="order-details-wrapper" style="font-size:12px; color:#666; margin-top:5px; border-top:1px dashed #ccc;">📍 ${siparis.musteri.adres}</div>`;
+                } else {
+                    baslik = `<span style="font-size:20px;">${siparis.masa}</span>`;
+                    let masaNo = parseInt(siparis.masa.replace("Masa ", ""));
+                    if (masaNo >= 1 && masaNo <= 18) { targetGrid = document.getElementById("mutfak-ust"); } 
+                    else { targetGrid = document.getElementById("mutfak-alt"); }
+                }
+
+                let butonHTML = "";
+                if(isOrderDone) {
+                    butonHTML = `<div class="order-details-wrapper kitchen-ready-msg" style="margin-top:10px; background:#27ae60; color:white; text-align:center; padding:10px; border-radius:8px; font-weight:bold;">✅ SERVİSE HAZIR<br><span style="font-size:11px;">${siparis.hazir_saat}</span></div>`;
+                } else {
+                    butonHTML = `<button class="ready-btn" onclick="siparisiHazirla('${key}')">👨‍🍳 HAZIRLA</button>`;
+                }
+
+                const cardHTML = `
+                    <div id="card-${key}" class="${cardClass}">
+                        <div class="order-header" style="margin-bottom:5px;">
+                            ${baslik} 
+                            <i id="icon-${key}" class="${iconClass}" onclick="toggleCard('${key}')"></i>
+                            <span class="order-details-wrapper" style="font-size:14px; color:#666; float:right; margin-right:10px;">${siparis.saat}</span>
+                        </div>
+                        <ul class="order-list-compact" style="margin-bottom:10px;">${urunHTML}</ul>
+                        <div class="order-details-wrapper">${notHTML}</div>
+                        ${paketBilgi}
+                        ${butonHTML}
+                    </div>
+                `;
+
+                if(targetGrid) targetGrid.innerHTML += cardHTML;
             });
         }
     }
 
     window.siparisiHazirla = async function(key) {
-        const snap = await get(ref(db, 'siparisler/' + key)); if (snap.exists()) { const order = snap.val(); const updated = order.urunler.map(u => { if(u.cat !== 'İÇECEKLER') return { ...u, hazir: true }; return u; }); update(ref(db, 'siparisler/' + key), { urunler: updated, durum: 'hazir', hazir_saat: new Date().toLocaleTimeString('tr-TR', {hour:'2-digit',minute:'2-digit'}) }); }
+        const snap = await get(ref(db, 'siparisler/' + key));
+        if (snap.exists()) {
+            const order = snap.val();
+            const updated = order.urunler.map(u => { if(u.cat !== 'İÇECEKLER') return { ...u, hazir: true }; return u; });
+            update(ref(db, 'siparisler/' + key), { urunler: updated, durum: 'hazir', hazir_saat: new Date().toLocaleTimeString('tr-TR', {hour:'2-digit',minute:'2-digit'}), lastUpdated: Date.now() });
+        }
     }
 
     window.siparisleriGetir = function() {
-        const data = activeOrders; const container = document.getElementById("kasaContainer");
+        const data = activeOrders;
+        const container = document.getElementById("kasaContainer");
         if(container) {
-            container.innerHTML = ""; if (!data) { container.innerHTML = "<p style='text-align:center; color:var(--text-muted); margin-top:50px;'>Aktif sipariş bulunmuyor.</p>"; return; }
-            const altDiv = document.createElement("div"); altDiv.className = "floor-section"; altDiv.innerHTML = '<div class="floor-title bg-alt" style="color:#d97706; background:#fffbeb; border:1px solid #fcd34d;">⬇️ ALT KAT</div><div class="order-container" id="grid-alt"></div>';
-            const ustDiv = document.createElement("div"); ustDiv.className = "floor-section"; ustDiv.innerHTML = '<div class="floor-title bg-ust" style="color:#7c3aed; background:#f5f3ff; border:1px solid #c4b5fd;">⬆️ ÜST KAT</div><div class="order-container" id="grid-ust"></div>';
-            const paketDiv = document.createElement("div"); paketDiv.className = "floor-section"; paketDiv.innerHTML = '<div class="floor-title bg-paket" style="color:#2563eb; background:#eff6ff; border:1px solid #bfdbfe;">🛵 PAKET SERVİS</div><div class="order-container" id="grid-paket"></div>';
+            container.innerHTML = ""; 
+            if (!data) { container.innerHTML = "<p style='text-align:center;'>Sipariş yok.</p>"; return; }
+
+            const altDiv = document.createElement("div"); altDiv.className = "floor-section";
+            altDiv.innerHTML = '<div class="floor-title bg-alt" style="color:#d97706; background:#fffbeb; border:1px solid #fcd34d;">⬇️ ALT KAT</div><div class="order-container" id="grid-alt"></div>';
+            
+            const ustDiv = document.createElement("div"); ustDiv.className = "floor-section";
+            ustDiv.innerHTML = '<div class="floor-title bg-ust" style="color:#7c3aed; background:#f5f3ff; border:1px solid #c4b5fd;">⬆️ ÜST KAT</div><div class="order-container" id="grid-ust"></div>';
+
+            const paketDiv = document.createElement("div"); paketDiv.className = "floor-section";
+            paketDiv.innerHTML = '<div class="floor-title bg-paket" style="color:#2563eb; background:#eff6ff; border:1px solid #bfdbfe;">🛵 PAKET SERVİS</div><div class="order-container" id="grid-paket"></div>';
+
             container.appendChild(altDiv); container.appendChild(ustDiv); container.appendChild(paketDiv);
-            Object.keys(data).forEach(key => {
-                const siparis = data[key]; let targetGrid, cardClass;
-                if (siparis.isPaket) { targetGrid = document.getElementById("grid-paket"); cardClass = "card-paket"; } else { let masaNo = parseInt(siparis.masa.replace("Masa ", "")); if (masaNo >= 1 && masaNo <= 18) { targetGrid = document.getElementById("grid-ust"); cardClass = "card-ust"; } else { targetGrid = document.getElementById("grid-alt"); cardClass = "card-alt"; } }
-                let urunHTML = ""; siparis.urunler.forEach(u => { let porsiyonBilgisi = ""; if(u.porsiyon && u.porsiyon != 1) { porsiyonBilgisi = `<span style="color:var(--danger); font-weight:bold; font-size:12px; margin-left:5px;">(${u.porsiyon} Pors.)</span>`; } let safAd = u.ad.split(" (")[0]; urunHTML += `<li style="display:flex; justify-content:space-between; align-items:center;"><div>${safAd}${porsiyonBilgisi}</div> <div style="font-weight:700;">${u.fiyat}₺</div></li>`; });
-                let header = siparis.isPaket ? `<span>🛵 ${siparis.kurye} - ${siparis.musteri.isim}</span>` : `<span>${siparis.masa}</span>`; let adresBilgi = siparis.isPaket ? `<div style='font-size:12px; color:var(--text-muted); margin-bottom:8px; border-top:1px dashed #e2e8f0; padding-top:5px;'>${siparis.musteri.adres}</div>` : "";
+            
+            const sortedOrders = Object.entries(data).sort((a, b) => (b[1].lastUpdated || 0) - (a[1].lastUpdated || 0));
+
+            sortedOrders.forEach(([key, siparis]) => {
+                let targetGrid, cardClass;
+                if (siparis.isPaket) { targetGrid = document.getElementById("grid-paket"); cardClass = "card-paket"; } 
+                else {
+                    let masaNo = parseInt(siparis.masa.replace("Masa ", ""));
+                    if (masaNo >= 1 && masaNo <= 18) { targetGrid = document.getElementById("grid-ust"); cardClass = "card-ust"; }
+                    else { targetGrid = document.getElementById("grid-alt"); cardClass = "card-alt"; }
+                }
+                
+                let urunHTML = "";
+                siparis.urunler.forEach(u => { 
+                    let displayName = u.ad.replace(/ \(\d+(\.\d+)? Pors\.\)$/, "");
+                    if(u.porsiyon && u.porsiyon != 1) {
+                        displayName += ` <span style="color:#d35400; font-weight:bold; font-size:12px;">(${u.porsiyon} Pors.)</span>`;
+                    }
+
+                    urunHTML += `<li style="display:flex; justify-content:space-between; align-items:center;">
+                        <div>${displayName}</div> 
+                        <div style="font-weight:bold;">${u.fiyat}₺</div>
+                    </li>`; 
+                });
+                
+                let header = siparis.isPaket ? `<span>🛵 ${siparis.kurye} - ${siparis.musteri.isim}</span>` : `<span>${siparis.masa}</span>`;
+                let adresBilgi = siparis.isPaket ? `<div style='font-size:11px; color:#555; margin-bottom:5px;'>${siparis.musteri.adres}</div>` : "";
+                
                 const div = document.createElement("div"); div.className = `order-card ${cardClass}`;
-                div.innerHTML = `<div class="order-header">${header} <span style="font-size:13px; color:var(--text-muted); font-weight:500;">${siparis.saat}</span></div>${adresBilgi}<div class="order-list-container"><ul class="order-list-compact">${urunHTML}</ul></div><div class="total-price-compact" style="margin-top:auto; padding-top:10px; border-top:2px solid #f1f5f9;">TOPLAM: ${siparis.toplam} ₺</div><div class="action-buttons"><button class="action-btn-sm btn-print" onclick="fisiYazdir('${key}')"><i class="fas fa-print"></i> YAZDIR</button><button class="action-btn-sm btn-edit" onclick="siparisDuzenle('${key}')"><i class="fas fa-edit"></i> DÜZENLE</button><button class="action-btn-sm btn-pay" onclick="hesabiKapat('${key}')"><i class="fas fa-wallet"></i> ÖDENDİ</button></div>`;
+                div.innerHTML = `<div class="order-header">${header} <span style="font-size:13px; color:#888">${siparis.saat}</span></div>${adresBilgi}<div class="order-list-container"><ul class="order-list-compact">${urunHTML}</ul></div><div class="total-price-compact">TOPLAM: ${siparis.toplam} ₺</div><div class="action-buttons"><button class="action-btn-sm btn-print" onclick="fisiYazdir('${key}')"><i class="fas fa-print"></i> YAZDIR</button><button class="action-btn-sm btn-edit" onclick="siparisDuzenle('${key}')"><i class="fas fa-edit"></i> DÜZENLE</button><button class="action-btn-sm btn-pay" onclick="hesabiKapat('${key}')"><i class="fas fa-wallet"></i> ÖDENDİ</button></div>`;
                 if(targetGrid) targetGrid.appendChild(div);
             });
         }
     }
 
     window.hesabiKapat = async function(key) {
-        if(confirm("Hesap ödendi mi?")) { const snap = await get(ref(db, 'siparisler/' + key)); if(snap.exists()) { await push(ref(db, 'arsiv'), snap.val()); await remove(ref(db, 'siparisler/' + key)); } }
+        if(confirm("Hesap ödendi mi?")) {
+            const snap = await get(ref(db, 'siparisler/' + key));
+            if(snap.exists()) { await push(ref(db, 'arsiv'), snap.val()); await remove(ref(db, 'siparisler/' + key)); }
+        }
     }
 
     window.raporlariAc = function() {
         document.getElementById("kasa-panel").style.display = "none"; document.getElementById("rapor-panel").style.display = "block";
         get(ref(db, 'arsiv')).then((snapshot) => {
             if(snapshot.exists()) {
-                const data = snapshot.val(); let ciro = 0; let sayim = {}; let masaSayisi = 0; let kuryeCiro = {}; 
+                const data = snapshot.val();
+                let ciro = 0; let sayim = {}; let masaSayisi = 0; let kuryeCiro = {}; 
                 Object.values(data).forEach(s => {
                     ciro += s.toplam; masaSayisi++;
                     if(s.urunler) s.urunler.forEach(u => { let temizAd = u.ad.split(" (")[0]; sayim[temizAd] = (sayim[temizAd] || 0) + (u.porsiyon || 1); });
@@ -973,7 +1120,7 @@
                 });
                 document.getElementById("gunlukCiro").innerText = ciro + " ₺"; document.getElementById("toplamMasa").innerText = masaSayisi;
                 const liste = document.getElementById("satilanUrunlerListesi"); liste.innerHTML = "";
-                Object.entries(sayim).sort((a,b)=>b[1]-a[1]).forEach(([ad, adet]) => { liste.innerHTML += `<li style='border-bottom:1px solid #f1f5f9; padding:10px 0; display:flex; justify-content:space-between; font-size:14px;'><span>${ad}</span> <b style="color:var(--primary);">${adet} Pors.</b></li>`; });
+                Object.entries(sayim).sort((a,b)=>b[1]-a[1]).forEach(([ad, adet]) => { liste.innerHTML += `<li style='border-bottom:1px solid #eee; padding:8px 0; display:flex; justify-content:space-between; font-size:14px;'><span>${ad}</span> <b>${adet} Pors.</b></li>`; });
                 const kuryeListesi = document.getElementById("kuryeRaporListesi"); kuryeListesi.innerHTML = "";
                 if(Object.keys(kuryeCiro).length === 0) { kuryeListesi.innerHTML = "<span style='color:#999'>Henüz paket teslimatı yok.</span>"; } 
                 else { Object.entries(kuryeCiro).forEach(([isim, tutar]) => { kuryeListesi.innerHTML += `<div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #f0f0f0;"><span style="font-weight:600;"><i class="fas fa-user-helmet-safety"></i> ${isim}</span><span style="color:var(--success); font-weight:800;">${tutar} ₺</span></div>`; }); }
