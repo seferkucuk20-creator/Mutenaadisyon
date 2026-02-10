@@ -1350,17 +1350,17 @@ let butonHTML = "";
         document.getElementById("lock-screen").style.display = "none";
     }
 
-    // 2. Giriş Yap Fonksiyonu
+    // 2. Giriş Yap Fonksiyonu (GÜNCELLENMİŞ HALİ)
     window.siteGirisYap = function() {
         const girilen = document.getElementById("siteLoginPass").value;
         const passRef = ref(db, 'settings/siteSifresi');
 
         get(passRef).then((snapshot) => {
-            // Veritabanında şifre yoksa varsayılan 'mutena123' kabul et
             const gercekSifre = snapshot.exists() ? snapshot.val().toString() : "mutena123";
             
             if (girilen === gercekSifre) {
                 localStorage.setItem("mutenaGiris", "true");
+                localStorage.setItem("sessionKey", girilen); // YENİ: Şifreyi hafızaya alıyoruz
                 document.getElementById("lock-screen").style.display = "none";
             } else {
                 alert("⛔ Hatalı Şifre!");
@@ -1397,6 +1397,21 @@ let butonHTML = "";
             }
         });
     }
+// --- OTOMATİK GÜVENLİK KONTROLÜ (YENİ) ---
+    // Veritabanındaki şifre değiştiğinde tüm cihazları kilit ekranına atar
+    onValue(ref(db, 'settings/siteSifresi'), (snapshot) => {
+        const guncelSifre = snapshot.exists() ? snapshot.val().toString() : "mutena123";
+        const cihazdakiSifre = localStorage.getItem("sessionKey");
+        const girisVarMi = localStorage.getItem("mutenaGiris") === "true";
+
+        // Eğer giriş yapılmışsa AMA cihazdaki şifre sunucudakiyle uyuşmuyorsa
+        if (girisVarMi && cihazdakiSifre !== guncelSifre) {
+            alert("🔒 Şifre değiştirildi! Güvenlik nedeniyle çıkış yapılıyor.");
+            localStorage.removeItem("mutenaGiris");
+            localStorage.removeItem("sessionKey");
+            location.reload(); // Sayfayı yenile ve kilit ekranını getir
+        }
+    });
 </script>
 <div id="sitePasswordModal" class="modal" style="z-index: 2600;">
     <div class="modal-content" style="text-align:center;">
